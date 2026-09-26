@@ -269,6 +269,18 @@ app.post("/assistant", (req, res) => {
             return;
         }
 
+        // ===============================
+        // Lock Computer
+        // ===============================
+
+        if (pythonData.action === "lock_computer") {
+
+            exec("rundll32.exe user32.dll,LockWorkStation");
+
+            res.json(pythonData);
+
+            return;
+        }
 
         // ===============================
         // Open File Explorer
@@ -298,6 +310,19 @@ app.post("/assistant", (req, res) => {
         }
 
 
+        // ===============================
+        // Open Chrome
+        // ===============================
+
+        if (pythonData.action === "open_chrome") {
+
+            exec("start chrome");
+
+            res.json(pythonData);
+
+            return;
+        }
+        
         // ===============================
         // Open YouTube
         // ===============================

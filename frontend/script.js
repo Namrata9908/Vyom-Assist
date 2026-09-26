@@ -2,180 +2,476 @@ const startButton = document.getElementById("startButton");
 const commandInput = document.getElementById("commandInput");
 const sendCommandButton = document.getElementById("sendCommandButton");
 const voiceButton = document.getElementById("voiceButton");
+
 const shutdownModal = document.getElementById("shutdownModal");
 const shutdownYesButton = document.getElementById("shutdownYesButton");
 const shutdownNoButton = document.getElementById("shutdownNoButton");
+
 const restartModal = document.getElementById("restartModal");
 const restartYesButton = document.getElementById("restartYesButton");
 const restartNoButton = document.getElementById("restartNoButton");
 
+
+// ========================================
+// Start Button
+// ========================================
+
 startButton.addEventListener("click", function () {
+
     alert("Vyom Assist is ready!");
+
 });
 
+
+// ========================================
+// Send Command
+// ========================================
+
 sendCommandButton.addEventListener("click", async function () {
+
     const command = commandInput.value;
 
     if (command.trim() === "") {
+
         alert("Please enter a command.");
+
         return;
     }
 
+
     try {
-        const response = await fetch("http://localhost:5000/assistant", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                command: command
-            })
-        });
+
+        const response = await fetch(
+            "http://localhost:5000/assistant",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    command: command
+                })
+            }
+        );
+
 
         const data = await response.json();
 
+
+        // ========================================
+        // Shutdown Confirmation
+        // ========================================
+
         if (data.action === "shutdown_confirmation") {
+
             shutdownModal.style.display = "flex";
+
             return;
-        } else if (data.action === "restart_confirmation") {
+        }
+
+
+        // ========================================
+        // Restart Confirmation
+        // ========================================
+
+        else if (data.action === "restart_confirmation") {
+
             restartModal.style.display = "flex";
+
             return;
-        } else if (data.action === "greeting") {
+        }
+
+
+        // ========================================
+        // Lock Computer
+        // ========================================
+
+        else if (data.action === "lock_computer") {
+
             alert(data.message);
-        } else if (data.action === "time") {
+
+            return;
+        }
+
+
+        // ========================================
+        // Greeting
+        // ========================================
+
+        else if (data.action === "greeting") {
+
             alert(data.message);
-        } else if (data.action === "open_calculator") {
+
+            return;
+        }
+
+
+        // ========================================
+        // Time
+        // ========================================
+
+        else if (data.action === "time") {
+
             alert(data.message);
-        } else if (data.action === "open_youtube") {
-            window.open("https://www.youtube.com", "_blank");
-        } else if (data.action === "open_google") {
-            window.open("https://www.google.com", "_blank");
-        } else if (data.action === "open_gmail") {
-            window.open("https://mail.google.com", "_blank");
-        } else if (data.action === "search_google") {
+
+            return;
+        }
+
+
+        // ========================================
+        // Date
+        // ========================================
+
+        else if (data.action === "date") {
+
+            alert(data.message);
+
+            return;
+        }
+
+
+        // ========================================
+        // Calculator
+        // ========================================
+
+        else if (data.action === "open_calculator") {
+
+            alert(data.message);
+
+            return;
+        }
+
+
+        // ========================================
+        // YouTube
+        // ========================================
+
+        else if (data.action === "open_youtube") {
+
+            window.open(
+                "https://www.youtube.com",
+                "_blank"
+            );
+
+            return;
+        }
+
+
+        // ========================================
+        // Google
+        // ========================================
+
+        else if (data.action === "open_google") {
+
+            window.open(
+                "https://www.google.com",
+                "_blank"
+            );
+
+            return;
+        }
+
+
+        // ========================================
+        // Gmail
+        // ========================================
+
+        else if (data.action === "open_gmail") {
+
+            window.open(
+                "https://mail.google.com",
+                "_blank"
+            );
+
+            return;
+        }
+
+
+        // ========================================
+        // Google Search
+        // ========================================
+
+        else if (data.action === "search_google") {
+
             const searchUrl =
                 "https://www.google.com/search?q=" +
                 encodeURIComponent(data.query);
 
-            window.open(searchUrl, "_blank");
-        } else {
-            alert(data.message);
+            window.open(
+                searchUrl,
+                "_blank"
+            );
+
+            return;
         }
 
-    } catch (error) {
-        alert("Could not connect to Vyom Assist backend.");
-        console.error(error);
+
+        // ========================================
+        // Default Response
+        // ========================================
+
+        else {
+
+            alert(data.message);
+
+            return;
+        }
+
     }
+
+    catch (error) {
+
+        console.error(
+            "Vyom Assist frontend error:",
+            error
+        );
+
+        alert(
+            "Could not connect to Vyom Assist backend."
+        );
+
+    }
+
 });
 
+
+// ========================================
+// Voice Button
+// ========================================
+
 voiceButton.addEventListener("click", function () {
+
     const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
 
     if (!SpeechRecognition) {
-        alert("Speech recognition is not supported in this browser.");
+
+        alert(
+            "Speech recognition is not supported in this browser."
+        );
+
         return;
     }
 
-    const recognition = new SpeechRecognition();
+
+    const recognition =
+        new SpeechRecognition();
+
 
     recognition.lang = "en-US";
+
     recognition.continuous = false;
+
     recognition.interimResults = false;
+
 
     recognition.start();
 
-    voiceButton.textContent = "🎙️ Listening...";
+
+    voiceButton.textContent =
+        "🎙️ Listening...";
+
 
     recognition.onresult = function (event) {
-        const spokenCommand = event.results[0][0].transcript;
 
-        commandInput.value = spokenCommand;
+        const spokenCommand =
+            event.results[0][0].transcript;
 
-        voiceButton.textContent = "🎤 Speak Command";
+
+        commandInput.value =
+            spokenCommand;
+
+
+        voiceButton.textContent =
+            "🎤 Speak Command";
+
     };
+
 
     recognition.onerror = function (event) {
-        console.error("Speech recognition error:", event.error);
 
-        voiceButton.textContent = "🎤 Speak Command";
+        console.error(
+            "Speech recognition error:",
+            event.error
+        );
 
-        alert("Could not recognize your voice.");
+
+        voiceButton.textContent =
+            "🎤 Speak Command";
+
+
+        alert(
+            "Could not recognize your voice."
+        );
+
     };
+
 
     recognition.onend = function () {
-        voiceButton.textContent = "🎤 Speak Command";
+
+        voiceButton.textContent =
+            "🎤 Speak Command";
+
     };
+
 });
 
-shutdownYesButton.addEventListener("click", async () => {
 
-    const finalConfirm = confirm(
-        "Final confirmation: Do you really want to shut down this computer?"
-    );
+// ========================================
+// Shutdown - Yes Button
+// ========================================
 
-    if (!finalConfirm) {
-        shutdownModal.style.display = "none";
-        return;
-    }
-    shutdownModal.style.display = "none";
+shutdownYesButton.addEventListener(
+    "click",
+    async () => {
 
-    try {
-        const response = await fetch("http://localhost:5000/shutdown", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+        const finalConfirm = confirm(
+            "Final confirmation: Do you really want to shut down this computer?"
+        );
 
-        const data = await response.json();
-        alert(data.message);
-    } catch (error) {
-        alert("Could not connect to Vyom Assist backend.");
-    }
-});
 
-shutdownNoButton.addEventListener("click", () => {
-    shutdownModal.style.display = "none";
-});
+        if (!finalConfirm) {
 
-restartYesButton.addEventListener("click", async () => {
+            shutdownModal.style.display =
+                "none";
 
-    const finalConfirm = confirm(
-        "Final confirmation: Do you really want to restart this computer?"
-    );
+            return;
+        }
 
-    if (!finalConfirm) {
-        restartModal.style.display = "none";
-        return;
-    }
 
-    restartModal.style.display = "none";
+        shutdownModal.style.display =
+            "none";
 
-    try {
 
-        const response = await fetch("http://localhost:5000/restart", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+        try {
 
-        const data = await response.json();
+            const response = await fetch(
+                "http://localhost:5000/shutdown",
+                {
+                    method: "POST",
 
-        console.log(data);
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
 
-        alert(data.message);
 
-    } catch (error) {
+            const data =
+                await response.json();
 
-        console.error(error);
 
-        alert("Could not connect to Vyom Assist backend.");
+            alert(data.message);
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Could not connect to Vyom Assist backend."
+            );
+
+        }
 
     }
-});
+);
 
-restartNoButton.addEventListener("click", () => {
-    restartModal.style.display = "none";
-});
+
+// ========================================
+// Shutdown - No Button
+// ========================================
+
+shutdownNoButton.addEventListener(
+    "click",
+    () => {
+
+        shutdownModal.style.display =
+            "none";
+
+    }
+);
+
+
+// ========================================
+// Restart - Yes Button
+// ========================================
+
+restartYesButton.addEventListener(
+    "click",
+    async () => {
+
+        const finalConfirm = confirm(
+            "Final confirmation: Do you really want to restart this computer?"
+        );
+
+
+        if (!finalConfirm) {
+
+            restartModal.style.display =
+                "none";
+
+            return;
+        }
+
+
+        restartModal.style.display =
+            "none";
+
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:5000/restart",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            );
+
+
+            const data =
+                await response.json();
+
+
+            console.log(data);
+
+            alert(data.message);
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Could not connect to Vyom Assist backend."
+            );
+
+        }
+
+    }
+);
+
+
+// ========================================
+// Restart - No Button
+// ========================================
+
+restartNoButton.addEventListener(
+    "click",
+    () => {
+
+        restartModal.style.display =
+            "none";
+
+    }
+);
