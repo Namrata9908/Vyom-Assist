@@ -2,6 +2,12 @@ const startButton = document.getElementById("startButton");
 const commandInput = document.getElementById("commandInput");
 const sendCommandButton = document.getElementById("sendCommandButton");
 const voiceButton = document.getElementById("voiceButton");
+const shutdownModal = document.getElementById("shutdownModal");
+const shutdownYesButton = document.getElementById("shutdownYesButton");
+const shutdownNoButton = document.getElementById("shutdownNoButton");
+const restartModal = document.getElementById("restartModal");
+const restartYesButton = document.getElementById("restartYesButton");
+const restartNoButton = document.getElementById("restartNoButton");
 
 startButton.addEventListener("click", function () {
     alert("Vyom Assist is ready!");
@@ -28,7 +34,17 @@ sendCommandButton.addEventListener("click", async function () {
 
         const data = await response.json();
 
-        if (data.action === "greeting") {
+        if (data.action === "shutdown_confirmation") {
+            shutdownModal.style.display = "flex";
+            return;
+        } else if (data.action === "restart_confirmation") {
+            restartModal.style.display = "flex";
+            return;
+        } else if (data.action === "greeting") {
+            alert(data.message);
+        } else if (data.action === "time") {
+            alert(data.message);
+        } else if (data.action === "open_calculator") {
             alert(data.message);
         } else if (data.action === "open_youtube") {
             window.open("https://www.youtube.com", "_blank");
@@ -90,4 +106,55 @@ voiceButton.addEventListener("click", function () {
     recognition.onend = function () {
         voiceButton.textContent = "🎤 Speak Command";
     };
+});
+
+shutdownYesButton.addEventListener("click", async () => {
+
+    const finalConfirm = confirm(
+        "Final confirmation: Do you really want to shut down this computer?"
+    );
+
+    if (!finalConfirm) {
+        shutdownModal.style.display = "none";
+        return;
+    }
+    shutdownModal.style.display = "none";
+
+    try {
+        const response = await fetch("http://localhost:5000/shutdown", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await response.json();
+        alert(data.message);
+    } catch (error) {
+        alert("Could not connect to Vyom Assist backend.");
+    }
+});
+
+shutdownNoButton.addEventListener("click", () => {
+    shutdownModal.style.display = "none";
+});
+
+restartYesButton.addEventListener("click", () => {
+
+    const finalConfirm = confirm(
+        "Final confirmation: Do you really want to restart this computer?"
+    );
+
+    if (!finalConfirm) {
+        restartModal.style.display = "none";
+        return;
+    }
+
+    restartModal.style.display = "none";
+
+    alert("Restart feature is ready. Actual restart will be added next.");
+});
+
+restartNoButton.addEventListener("click", () => {
+    restartModal.style.display = "none";
 });

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
+const { exec } = require("child_process");
 
 const app = express();
 
@@ -56,6 +57,18 @@ app.get("/health", (req, res) => {
     });
 });
 
+app.post("/shutdown", (req, res) => {
+
+    exec("shutdown /s /t 0");
+
+    res.json({
+        status: "success",
+        message: "Computer is shutting down..."
+    });
+});
+
+
+
 app.post("/assistant", (req, res) => {
     const command = req.body.command.trim().replace(/[.!?]+$/, "");
 
@@ -77,6 +90,68 @@ app.post("/assistant", (req, res) => {
         const pythonData = JSON.parse(pythonResponse);
 
         if (pythonData.action === "greeting") {
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "time") {
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "date") {
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "open_calculator") {
+            exec("start calc");
+
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "open_notepad") {
+            exec("start notepad");
+
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "open_command_prompt") {
+            exec("start cmd");
+
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "open_task_manager") {
+            exec("start taskmgr");
+
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "shutdown_confirmation") {
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "restart_confirmation") {
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "open_file_explorer") {
+            exec("start explorer");
+
+            res.json(pythonData);
+            return;
+        }
+
+        if (pythonData.action === "open_settings") {
+            exec("start ms-settings:");
+
             res.json(pythonData);
             return;
         }

@@ -18,3 +18,53 @@ button {
     font-size: 16px;
     cursor: pointer;
 }
+
+#shutdownModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#shutdownModal>div {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#shutdownModal button {
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+#restartModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#restartModal>div {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+#restartModal button {
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+}
