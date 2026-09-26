@@ -20,7 +20,7 @@ app.get("/health", (req, res) => {
 });
 
 app.post("/assistant", (req, res) => {
-    const command = req.body.command;
+    const command = req.body.command.trim().replace(/[.!?]+$/, "");
 
     if (command.toLowerCase() === "open youtube") {
         res.json({
@@ -36,6 +36,26 @@ app.post("/assistant", (req, res) => {
             receivedCommand: command,
             action: "open_google",
             message: "Opening Google..."
+        });
+        return;
+    }
+
+    if (command.toLowerCase() === "open gmail") {
+        res.json({
+            receivedCommand: command,
+            action: "open_gmail",
+            message: "Opening Gmail..."
+        });
+        return;
+    }
+    if (command.toLowerCase().startsWith("search ")) {
+        const searchQuery = command.substring(7).trim();
+
+        res.json({
+            receivedCommand: command,
+            action: "search_google",
+            query: searchQuery,
+            message: `Searching Google for ${searchQuery}...`
         });
         return;
     }

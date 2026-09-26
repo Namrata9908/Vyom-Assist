@@ -32,6 +32,14 @@ sendCommandButton.addEventListener("click", async function () {
             window.open("https://www.youtube.com", "_blank");
         } else if (data.action === "open_google") {
             window.open("https://www.google.com", "_blank");
+        } else if (data.action === "open_gmail") {
+            window.open("https://mail.google.com", "_blank");
+        } else if (data.action === "search_google") {
+            const searchUrl =
+                "https://www.google.com/search?q=" +
+                encodeURIComponent(data.query);
+
+            window.open(searchUrl, "_blank");
         } else {
             alert(data.message);
         }
@@ -40,4 +48,44 @@ sendCommandButton.addEventListener("click", async function () {
         alert("Could not connect to Vyom Assist backend.");
         console.error(error);
     }
+});
+
+voiceButton.addEventListener("click", function () {
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        alert("Speech recognition is not supported in this browser.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    voiceButton.textContent = "🎙️ Listening...";
+
+    recognition.onresult = function (event) {
+        const spokenCommand = event.results[0][0].transcript;
+
+        commandInput.value = spokenCommand;
+
+        voiceButton.textContent = "🎤 Speak Command";
+    };
+
+    recognition.onerror = function (event) {
+        console.error("Speech recognition error:", event.error);
+
+        voiceButton.textContent = "🎤 Speak Command";
+
+        alert("Could not recognize your voice.");
+    };
+
+    recognition.onend = function () {
+        voiceButton.textContent = "🎤 Speak Command";
+    };
 });
