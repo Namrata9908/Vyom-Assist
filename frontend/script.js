@@ -29,9 +29,9 @@ startButton.addEventListener("click", function () {
 
 sendCommandButton.addEventListener("click", async function () {
 
-    const command = commandInput.value;
+    const command = commandInput.value.trim();
 
-    if (command.trim() === "") {
+    if (command === "") {
 
         alert("Please enter a command.");
 
@@ -57,7 +57,19 @@ sendCommandButton.addEventListener("click", async function () {
         );
 
 
+        if (!response.ok) {
+
+            throw new Error(
+                `Backend returned ${response.status}`
+            );
+
+        }
+
+
         const data = await response.json();
+
+
+        console.log("Vyom Assist response:", data);
 
 
         // ========================================
@@ -145,6 +157,18 @@ sendCommandButton.addEventListener("click", async function () {
 
 
         // ========================================
+        // Chrome
+        // ========================================
+
+        else if (data.action === "open_chrome") {
+
+            alert(data.message);
+
+            return;
+        }
+
+
+        // ========================================
         // YouTube
         // ========================================
 
@@ -190,6 +214,49 @@ sendCommandButton.addEventListener("click", async function () {
 
 
         // ========================================
+        // Generic Website
+        // ========================================
+
+        else if (data.action === "open_website") {
+
+            let website = data.website.trim();
+
+
+            if (
+                website.startsWith("http://") ||
+                website.startsWith("https://")
+            ) {
+
+                window.open(
+                    website,
+                    "_blank"
+                );
+
+            }
+
+            else if (website.includes(".")) {
+
+                window.open(
+                    "https://" + website,
+                    "_blank"
+                );
+
+            }
+
+            else {
+
+                window.open(
+                    "https://www." + website + ".com",
+                    "_blank"
+                );
+
+            }
+
+            return;
+        }
+
+
+        // ========================================
         // Google Search
         // ========================================
 
@@ -198,6 +265,7 @@ sendCommandButton.addEventListener("click", async function () {
             const searchUrl =
                 "https://www.google.com/search?q=" +
                 encodeURIComponent(data.query);
+
 
             window.open(
                 searchUrl,
@@ -443,6 +511,7 @@ restartYesButton.addEventListener(
 
 
             console.log(data);
+
 
             alert(data.message);
 

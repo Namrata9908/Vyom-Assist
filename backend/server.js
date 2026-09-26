@@ -322,7 +322,7 @@ app.post("/assistant", (req, res) => {
 
             return;
         }
-        
+
         // ===============================
         // Open YouTube
         // ===============================
@@ -409,6 +409,26 @@ app.post("/assistant", (req, res) => {
             return;
         }
 
+        // ===============================
+        // Open Any Website
+        // ===============================
+
+        if (command.toLowerCase().startsWith("open ")) {
+
+            const websiteName = command.substring(5).trim();
+
+            const websiteUrl = `https://www.${websiteName}.com`;
+
+            res.json({
+                receivedCommand: command,
+                action: "open_website",
+                website: websiteName,
+                url: websiteUrl,
+                message: `Opening ${websiteName}...`
+            });
+
+            return;
+        }
 
         // ===============================
         // Default Response
