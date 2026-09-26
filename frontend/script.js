@@ -139,7 +139,7 @@ shutdownNoButton.addEventListener("click", () => {
     shutdownModal.style.display = "none";
 });
 
-restartYesButton.addEventListener("click", () => {
+restartYesButton.addEventListener("click", async () => {
 
     const finalConfirm = confirm(
         "Final confirmation: Do you really want to restart this computer?"
@@ -152,7 +152,28 @@ restartYesButton.addEventListener("click", () => {
 
     restartModal.style.display = "none";
 
-    alert("Restart feature is ready. Actual restart will be added next.");
+    try {
+
+        const response = await fetch("http://localhost:5000/restart", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        alert(data.message);
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Could not connect to Vyom Assist backend.");
+
+    }
 });
 
 restartNoButton.addEventListener("click", () => {
