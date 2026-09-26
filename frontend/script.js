@@ -1,6 +1,7 @@
 const startButton = document.getElementById("startButton");
 const commandInput = document.getElementById("commandInput");
 const sendCommandButton = document.getElementById("sendCommandButton");
+const voiceButton = document.getElementById("voiceButton");
 
 startButton.addEventListener("click", function () {
     alert("Vyom Assist is ready!");
@@ -29,6 +30,8 @@ sendCommandButton.addEventListener("click", async function () {
 
         if (data.action === "open_youtube") {
             window.open("https://www.youtube.com", "_blank");
+        } else if (data.action === "open_google") {
+            window.open("https://www.google.com", "_blank");
         } else {
             alert(data.message);
         }
