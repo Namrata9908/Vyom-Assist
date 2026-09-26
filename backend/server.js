@@ -31,6 +31,15 @@ app.post("/assistant", (req, res) => {
         return;
     }
 
+    if (command.toLowerCase() === "open google") {
+        res.json({
+            receivedCommand: command,
+            action: "open_google",
+            message: "Opening Google..."
+        });
+        return;
+    }
+
     res.json({
         receivedCommand: command,
         action: "none",
