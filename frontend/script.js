@@ -28,7 +28,9 @@ sendCommandButton.addEventListener("click", async function () {
 
         const data = await response.json();
 
-        if (data.action === "open_youtube") {
+        if (data.action === "greeting") {
+            alert(data.message);
+        } else if (data.action === "open_youtube") {
             window.open("https://www.youtube.com", "_blank");
         } else if (data.action === "open_google") {
             window.open("https://www.google.com", "_blank");

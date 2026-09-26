@@ -20,6 +20,13 @@ def assistant():
     data = request.get_json()
     command = data.get("command", "").strip().lower()
 
+    if command == "hello":
+     return jsonify({
+        "receivedCommand": command,
+        "action": "greeting",
+        "message": "Hello! I am Vyom Assist. How can I help you?"
+    })
+
     if command == "open youtube":
         return jsonify({
             "receivedCommand": command,

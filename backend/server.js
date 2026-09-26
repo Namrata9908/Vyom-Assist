@@ -74,6 +74,13 @@ app.post("/assistant", (req, res) => {
 
         console.log("Python response:", pythonResponse);
 
+        const pythonData = JSON.parse(pythonResponse);
+
+        if (pythonData.action === "greeting") {
+            res.json(pythonData);
+            return;
+        }
+
         if (command.toLowerCase() === "open youtube") {
             res.json({
                 receivedCommand: command,
