@@ -7,32 +7,206 @@ app = Flask(__name__)
 # ========================================
 # Common Command Normalizer
 # ========================================
-
 def normalize_command(command):
 
     command = command.strip().lower()
 
+    # Normalize multiple spaces
+    command = " ".join(command.split())
+
+    # Remove common punctuation at the end
+    command = command.rstrip(".!?")
+
+    # ========================================
     # Remove common polite prefixes
+    # ========================================
+
     prefixes_to_remove = [
         "please ",
         "can you ",
         "could you ",
         "would you ",
-        "will you "
+        "will you ",
+        "kindly ",
+        "hey ",
+        "hey vyom ",
+        "hey vyom assist ",
+        "vyom ",
+        "vyom assist "
     ]
 
-    for prefix in prefixes_to_remove:
+    changed = True
+
+    while changed:
+
+        changed = False
+
+        for prefix in prefixes_to_remove:
+
+            if command.startswith(prefix):
+
+                command = command[len(prefix):].strip()
+                changed = True
+                break
+
+
+    # ========================================
+    # Convert launch / start / go to / visit
+    # into open
+    # ========================================
+
+    open_prefixes = [
+        "launch ",
+        "start ",
+        "go to ",
+        "visit "
+    ]
+
+    for prefix in open_prefixes:
 
         if command.startswith(prefix):
-            command = command[len(prefix):].strip()
+
+            command = "open " + command[len(prefix):].strip()
             break
 
-    # Convert launch/start into open
-    if command.startswith("launch "):
-        command = "open " + command[7:].strip()
 
-    elif command.startswith("start "):
-        command = "open " + command[6:].strip()
+    # ========================================
+    # PC / Laptop normalization
+    # ========================================
+
+    command = command.replace("my pc", "my computer")
+    command = command.replace("the pc", "the computer")
+
+    # Standalone PC
+    if command == "pc":
+        command = "computer"
+
+    # Laptop variations
+    command = command.replace("my laptop", "my computer")
+    command = command.replace("the laptop", "the computer")
+
+    if command == "laptop":
+        command = "computer"
+
+
+    # ========================================
+    # Reboot → Restart
+    # ========================================
+
+    if command.startswith("reboot "):
+
+        command = "restart " + command[7:].strip()
+
+    elif command == "reboot":
+
+        command = "restart"
+
+
+    # ========================================
+    # Time variations
+    # ========================================
+
+    if command in [
+        "what's the time",
+        "whats the time",
+        "tell me the time",
+        "tell me what's the time",
+        "tell me whats the time"
+    ]:
+
+        command = "what time is it"
+
+
+    # ========================================
+    # Date variations
+    # ========================================
+
+    if command in [
+        "what's today's date",
+        "what’s today's date",
+        "what's today’s date",
+        "what’s today’s date",
+        "whats today's date",
+        "tell me today's date",
+        "tell me today’s date",
+        "tell me todays date"
+    ]:
+
+        command = "what is today's date"
+
+
+    # ========================================
+    # Lock variations
+    # ========================================
+
+    if command in [
+        "lock my computer",
+        "lock the computer",
+        "lock my pc",
+        "lock the pc",
+        "lock my laptop",
+        "lock the laptop"
+    ]:
+
+        command = "lock computer"
+
+
+    # ========================================
+    # Shutdown variations
+    # ========================================
+
+    if command in [
+        "shutdown my computer",
+        "shutdown the computer",
+        "shut down my computer",
+        "shut down the computer",
+        "shutdown my pc",
+        "shutdown the pc",
+        "shut down my pc",
+        "shut down the pc",
+        "shutdown my laptop",
+        "shutdown the laptop",
+        "shut down my laptop",
+        "shut down the laptop"
+    ]:
+
+        command = "shutdown computer"
+
+
+    # ========================================
+    # Restart variations
+    # ========================================
+
+    if command in [
+        "restart my computer",
+        "restart the computer",
+        "restart my pc",
+        "restart the pc",
+        "restart my laptop",
+        "restart the laptop"
+    ]:
+
+        command = "restart computer"
+
+
+    # ========================================
+    # Search variations
+    # ========================================
+
+    search_prefixes = [
+        "google ",
+        "search for ",
+        "look up ",
+        "find "
+    ]
+
+    for prefix in search_prefixes:
+
+        if command.startswith(prefix):
+
+            command = "search " + command[len(prefix):].strip()
+            break
+
 
     return command
 
@@ -236,6 +410,7 @@ def assistant():
     # ========================================
     # Restart Computer
     # ========================================
+    
 
     if command == "restart computer":
 

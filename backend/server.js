@@ -191,6 +191,14 @@ function normalizeCommand(command) {
     }
 
 
+    // PC / laptop / reboot variations
+    command = command
+        .replace(/\bmy pc\b/g, "my computer")
+        .replace(/\bthe pc\b/g, "the computer")
+        .replace(/\bpc\b/g, "computer")
+        .replace(/\blaptop\b/g, "computer")
+        .replace(/\breboot\b/g, "restart");
+
     return command;
 }
 
