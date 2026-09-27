@@ -11,9 +11,193 @@ app.use(express.json());
 const PORT = 5000;
 
 
-// ===============================
+// ========================================
+// Command Normalizer
+// ========================================
+
+function normalizeCommand(command) {
+
+    command = command.trim().toLowerCase();
+
+    // Normalize multiple spaces
+    command = command.replace(/\s+/g, " ");
+
+    // Remove common punctuation
+    command = command.replace(/[.!?]+$/, "");
+
+
+    // Remove common polite prefixes
+    const prefixesToRemove = [
+        "please ",
+        "can you ",
+        "could you ",
+        "would you ",
+        "will you ",
+        "kindly ",
+        "hey ",
+        "hey vyom ",
+        "hey vyom assist ",
+        "vyom ",
+        "vyom assist "
+    ];
+
+    let changed = true;
+
+    while (changed) {
+
+        changed = false;
+
+        for (const prefix of prefixesToRemove) {
+
+            if (command.startsWith(prefix)) {
+
+                command = command.substring(
+                    prefix.length
+                ).trim();
+
+                changed = true;
+
+                break;
+            }
+        }
+    }
+
+
+    // ========================================
+    // Convert common OPEN variations
+    // ========================================
+
+    const openPrefixes = [
+        "launch ",
+        "start ",
+        "go to ",
+        "visit "
+    ];
+
+    for (const prefix of openPrefixes) {
+
+        if (command.startsWith(prefix)) {
+
+            command =
+                "open " +
+                command.substring(prefix.length).trim();
+
+            break;
+        }
+    }
+
+
+    // ========================================
+    // Convert common TIME variations
+    // ========================================
+
+    if (
+        command === "what's the time" ||
+        command === "whats the time" ||
+        command === "tell me the time" ||
+        command === "can you tell me the time"
+    ) {
+        command = "what time is it";
+    }
+
+
+    // ========================================
+    // Convert common DATE variations
+    // ========================================
+
+    if (
+        command === "what's today's date" ||
+        command === "what’s today's date" ||
+        command === "what's today’s date" ||
+        command === "what’s today’s date" ||
+        command === "whats today's date" ||
+        command === "tell me today's date" ||
+        command === "tell me today’s date" ||
+        command === "tell me todays date"
+    ) {
+        command = "what is today's date";
+    }
+
+
+    // ========================================
+    // Convert common LOCK variations
+    // ========================================
+
+    if (
+        command === "lock my computer" ||
+        command === "lock the computer"
+    ) {
+        command = "lock computer";
+    }
+
+
+    // ========================================
+    // Convert common SHUTDOWN variations
+    // ========================================
+
+    if (
+        command === "shutdown my computer" ||
+        command === "shutdown the computer"
+    ) {
+        command = "shutdown computer";
+    }
+
+
+    // ========================================
+    // Convert common SHUT DOWN variations
+    // ========================================
+
+    if (
+        command === "shut down my computer" ||
+        command === "shut down the computer"
+    ) {
+        command = "shutdown computer";
+    }
+
+
+    // ========================================
+    // Convert common RESTART variations
+    // ========================================
+
+    if (
+        command === "restart my computer" ||
+        command === "restart the computer"
+    ) {
+        command = "restart computer";
+    }
+
+
+    // ========================================
+    // Convert common SEARCH variations
+    // ========================================
+
+    const searchPrefixes = [
+        "google ",
+        "search for ",
+        "look up ",
+        "find "
+    ];
+
+    for (const prefix of searchPrefixes) {
+
+        if (command.startsWith(prefix)) {
+
+            command =
+                "search " +
+                command.substring(prefix.length).trim();
+
+            break;
+        }
+    }
+
+
+    return command;
+}
+
+
+// ========================================
 // Send command to Python Assistant
-// ===============================
+// ========================================
 
 function sendToPython(command, callback) {
 
@@ -56,9 +240,9 @@ function sendToPython(command, callback) {
 }
 
 
-// ===============================
+// ========================================
 // Home
-// ===============================
+// ========================================
 
 app.get("/", (req, res) => {
 
@@ -67,9 +251,9 @@ app.get("/", (req, res) => {
 });
 
 
-// ===============================
+// ========================================
 // Health Check
-// ===============================
+// ========================================
 
 app.get("/health", (req, res) => {
 
@@ -81,9 +265,9 @@ app.get("/health", (req, res) => {
 });
 
 
-// ===============================
+// ========================================
 // Shutdown Computer
-// ===============================
+// ========================================
 
 app.post("/shutdown", (req, res) => {
 
@@ -97,9 +281,9 @@ app.post("/shutdown", (req, res) => {
 });
 
 
-// ===============================
+// ========================================
 // Restart Computer
-// ===============================
+// ========================================
 
 app.post("/restart", (req, res) => {
 
@@ -113,20 +297,22 @@ app.post("/restart", (req, res) => {
 });
 
 
-// ===============================
+// ========================================
 // Main Assistant Endpoint
-// ===============================
+// ========================================
 
 app.post("/assistant", (req, res) => {
 
-    const command = req.body.command.trim().replace(/[.!?]+$/, "");
-
+    const command = normalizeCommand(
+        req.body.command || ""
+    );
 
     sendToPython(command, (error, pythonResponse) => {
 
-        // ===============================
+
+        // ========================================
         // Python connection error
-        // ===============================
+        // ========================================
 
         if (error) {
 
@@ -154,9 +340,9 @@ app.post("/assistant", (req, res) => {
         const pythonData = JSON.parse(pythonResponse);
 
 
-        // ===============================
+        // ========================================
         // Greeting
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "greeting") {
 
@@ -166,9 +352,9 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Time
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "time") {
 
@@ -178,9 +364,9 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Date
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "date") {
 
@@ -190,9 +376,21 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
+        // Search from Python
+        // ========================================
+
+        if (pythonData.action === "search_google") {
+
+            res.json(pythonData);
+
+            return;
+        }
+
+
+        // ========================================
         // Open Calculator
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "open_calculator") {
 
@@ -204,9 +402,9 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Open Notepad
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "open_notepad") {
 
@@ -218,9 +416,9 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Open Command Prompt
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "open_command_prompt") {
 
@@ -232,9 +430,9 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Open Task Manager
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "open_task_manager") {
 
@@ -246,9 +444,9 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Shutdown Confirmation
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "shutdown_confirmation") {
 
@@ -258,9 +456,9 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Restart Confirmation
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "restart_confirmation") {
 
@@ -269,22 +467,26 @@ app.post("/assistant", (req, res) => {
             return;
         }
 
-        // ===============================
+
+        // ========================================
         // Lock Computer
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "lock_computer") {
 
-            exec("rundll32.exe user32.dll,LockWorkStation");
+            exec(
+                "rundll32.exe user32.dll,LockWorkStation"
+            );
 
             res.json(pythonData);
 
             return;
         }
 
-        // ===============================
+
+        // ========================================
         // Open File Explorer
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "open_file_explorer") {
 
@@ -296,9 +498,9 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Open Settings
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "open_settings") {
 
@@ -310,9 +512,9 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Open Chrome
-        // ===============================
+        // ========================================
 
         if (pythonData.action === "open_chrome") {
 
@@ -323,11 +525,12 @@ app.post("/assistant", (req, res) => {
             return;
         }
 
-        // ===============================
-        // Open YouTube
-        // ===============================
 
-        if (command.toLowerCase() === "open youtube") {
+        // ========================================
+        // Open YouTube
+        // ========================================
+
+        if (command === "open youtube") {
 
             res.json({
 
@@ -343,11 +546,11 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Open Google
-        // ===============================
+        // ========================================
 
-        if (command.toLowerCase() === "open google") {
+        if (command === "open google") {
 
             res.json({
 
@@ -363,11 +566,11 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Open Gmail
-        // ===============================
+        // ========================================
 
-        if (command.toLowerCase() === "open gmail") {
+        if (command === "open gmail") {
 
             res.json({
 
@@ -383,11 +586,11 @@ app.post("/assistant", (req, res) => {
         }
 
 
-        // ===============================
+        // ========================================
         // Google Search
-        // ===============================
+        // ========================================
 
-        if (command.toLowerCase().startsWith("search ")) {
+        if (command.startsWith("search ")) {
 
             const searchQuery =
                 command.substring(7).trim();
@@ -409,30 +612,74 @@ app.post("/assistant", (req, res) => {
             return;
         }
 
-        // ===============================
-        // Open Any Website
-        // ===============================
 
-        if (command.toLowerCase().startsWith("open ")) {
+        // ========================================
+        // Open Any Website - Smart
+        // ========================================
 
-            const websiteName = command.substring(5).trim();
+        if (command.startsWith("open ")) {
 
-            const websiteUrl = `https://www.${websiteName}.com`;
+            const websiteName =
+                command.substring(5).trim();
 
-            res.json({
-                receivedCommand: command,
-                action: "open_website",
-                website: websiteName,
-                url: websiteUrl,
-                message: `Opening ${websiteName}...`
-            });
 
-            return;
+            if (websiteName !== "") {
+
+                let websiteUrl;
+
+
+                // Complete URL
+                if (
+                    websiteName.startsWith("http://") ||
+                    websiteName.startsWith("https://")
+                ) {
+
+                    websiteUrl = websiteName;
+
+                }
+
+
+                // Domain like github.com
+                else if (websiteName.includes(".")) {
+
+                    websiteUrl =
+                        `https://${websiteName}`;
+
+                }
+
+
+                // Assume .com
+                else {
+
+                    websiteUrl =
+                        `https://www.${websiteName}.com`;
+
+                }
+
+
+                res.json({
+
+                    receivedCommand: command,
+
+                    action: "open_website",
+
+                    website: websiteName,
+
+                    url: websiteUrl,
+
+                    message:
+                        `Opening ${websiteName}...`
+
+                });
+
+                return;
+            }
         }
 
-        // ===============================
+
+        // ========================================
         // Default Response
-        // ===============================
+        // ========================================
 
         res.json({
 
@@ -450,9 +697,9 @@ app.post("/assistant", (req, res) => {
 });
 
 
-// ===============================
+// ========================================
 // Start Server
-// ===============================
+// ========================================
 
 app.listen(PORT, () => {
 

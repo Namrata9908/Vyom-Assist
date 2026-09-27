@@ -5,6 +5,39 @@ app = Flask(__name__)
 
 
 # ========================================
+# Common Command Normalizer
+# ========================================
+
+def normalize_command(command):
+
+    command = command.strip().lower()
+
+    # Remove common polite prefixes
+    prefixes_to_remove = [
+        "please ",
+        "can you ",
+        "could you ",
+        "would you ",
+        "will you "
+    ]
+
+    for prefix in prefixes_to_remove:
+
+        if command.startswith(prefix):
+            command = command[len(prefix):].strip()
+            break
+
+    # Convert launch/start into open
+    if command.startswith("launch "):
+        command = "open " + command[7:].strip()
+
+    elif command.startswith("start "):
+        command = "open " + command[6:].strip()
+
+    return command
+
+
+# ========================================
 # Home
 # ========================================
 
@@ -19,6 +52,7 @@ def home():
 
 @app.route("/health")
 def health():
+
     return jsonify({
         "status": "OK",
         "message": "Python assistant is healthy"
@@ -32,9 +66,11 @@ def health():
 @app.route("/assistant", methods=["POST"])
 def assistant():
 
-    data = request.get_json()
+    data = request.get_json() or {}
 
-    command = data.get("command", "").strip().lower()
+    command = normalize_command(
+        data.get("command", "")
+    )
 
 
     # ========================================
@@ -235,6 +271,38 @@ def assistant():
             "message": "Opening Calculator..."
         })
 
+
+    # ========================================
+    # Natural Language Search
+    # ========================================
+
+    search_prefixes = [
+        "search ",
+        "search for ",
+        "please search ",
+        "please search for ",
+        "can you search ",
+        "can you search for ",
+        "google ",
+        "find information about "
+    ]
+
+    for prefix in search_prefixes:
+
+        if command.startswith(prefix):
+
+            search_query = command[len(prefix):].strip()
+
+            if search_query:
+
+                return jsonify({
+                    "receivedCommand": command,
+                    "action": "search_google",
+                    "query": search_query,
+                    "message": f"Searching Google for {search_query}..."
+                })
+
+
     # ========================================
     # Open Chrome
     # ========================================
@@ -242,10 +310,12 @@ def assistant():
     if command == "open chrome":
 
         return jsonify({
-        "receivedCommand": command,
-        "action": "open_chrome",
-        "message": "Opening Google Chrome..."
-    })
+            "receivedCommand": command,
+            "action": "open_chrome",
+            "message": "Opening Google Chrome..."
+        })
+
+
     # ========================================
     # Open YouTube
     # ========================================

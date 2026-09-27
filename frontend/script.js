@@ -349,14 +349,14 @@ voiceButton.addEventListener("click", function () {
         const spokenCommand =
             event.results[0][0].transcript;
 
-
         commandInput.value =
             spokenCommand;
-
 
         voiceButton.textContent =
             "🎤 Speak Command";
 
+        // Automatically send the voice command
+        sendCommandButton.click();
     };
 
 
