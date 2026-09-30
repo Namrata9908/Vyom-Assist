@@ -336,6 +336,8 @@ voiceButton.addEventListener("click", function () {
 
     recognition.interimResults = false;
 
+    voiceButton.textContent = "🎤 Listening...";
+    voiceButton.disabled = true;
 
     recognition.start();
 
@@ -360,29 +362,24 @@ voiceButton.addEventListener("click", function () {
     };
 
 
-    recognition.onerror = function (event) {
+    recognition.onerror = (event) => {
+        if (event.error === "no-speech") {
+            return;
+        }
 
-        console.error(
-            "Speech recognition error:",
-            event.error
-        );
+        if (event.error === "not-allowed") {
+            alert("Microphone permission is required.");
+            return;
+        }
 
-
-        voiceButton.textContent =
-            "🎤 Speak Command";
-
-
-        alert(
-            "Could not recognize your voice."
-        );
-
+        alert("Voice recognition error. Please try again.");
     };
 
 
     recognition.onend = function () {
 
-        voiceButton.textContent =
-            "🎤 Speak Command";
+        voiceButton.textContent = "🎤 Speak Command";
+        voiceButton.disabled = false;
 
     };
 

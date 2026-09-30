@@ -207,6 +207,7 @@ def normalize_command(command):
             command = "search " + command[len(prefix):].strip()
             break
 
+        
 
     return command
 

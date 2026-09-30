@@ -199,6 +199,24 @@ function normalizeCommand(command) {
         .replace(/\blaptop\b/g, "computer")
         .replace(/\breboot\b/g, "restart");
 
+
+    // ========================================
+    // Direct Website / URL Commands
+    // ========================================
+
+    const validDomainPattern =
+        /^(?:[a-zA-Z0-9-]+\.)+(com|org|net|in|co\.in|io|dev|ai|app|edu|gov)(\/.*)?$/;
+
+    if (
+        command.startsWith("http://") ||
+        command.startsWith("https://")
+    ) {
+        command = "open " + command;
+    }
+    else if (validDomainPattern.test(command)) {
+        command = "open " + command;
+    }
+
     return command;
 }
 
