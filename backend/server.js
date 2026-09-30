@@ -401,6 +401,82 @@ app.post("/assistant", (req, res) => {
             return;
         }
 
+        // ========================================
+        // System Information
+        // ========================================
+
+        if (pythonData.action === "system_info") {
+
+            res.json(pythonData);
+
+            return;
+        }
+
+        // ========================================
+        // System Status
+        // ========================================
+
+        if (pythonData.action === "system_status") {
+
+            res.json(pythonData);
+
+            return;
+        }
+
+        // ========================================
+        // Battery Status
+        // ========================================
+
+        if (pythonData.action === "battery_status") {
+
+            res.json(pythonData);
+
+            return;
+        }
+
+        // ========================================
+        // CPU Status
+        // ========================================
+
+        if (pythonData.action === "cpu_status") {
+
+            res.json(pythonData);
+
+            return;
+        }
+
+        // ========================================
+        // RAM Status
+        // ========================================
+
+        if (pythonData.action === "ram_status") {
+
+            res.json(pythonData);
+
+            return;
+        }
+
+        // ========================================
+        // Disk / Storage Status
+        // ========================================
+
+        if (pythonData.action === "disk_status") {
+
+            res.json(pythonData);
+
+            return;
+        }
+
+        // ========================================
+        // Internet / Network Status
+        // ========================================
+
+        if (pythonData.action === "internet_status") {
+
+            res.json(pythonData);
+
+            return;
+        }
 
         // ========================================
         // Search from Python

@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
 from datetime import datetime
+import platform
+import psutil
 
 app = Flask(__name__)
 
@@ -107,6 +109,7 @@ def normalize_command(command):
     # ========================================
 
     if command in [
+        "what is the time",
         "what's the time",
         "whats the time",
         "tell me the time",
@@ -122,6 +125,7 @@ def normalize_command(command):
     # ========================================
 
     if command in [
+        "what is the date",
         "what's today's date",
         "what’s today's date",
         "what's today’s date",
@@ -135,6 +139,8 @@ def normalize_command(command):
         command = "what is today's date"
 
 
+    
+    
     # ========================================
     # Lock variations
     # ========================================
@@ -329,6 +335,199 @@ def assistant():
             "message": f"Today's date is {current_date}."
         })
 
+    # ========================================
+    # System Information
+    # ========================================
+
+    if command in [
+        "system information",
+        "system info",
+        "computer information",
+        "computer info",
+        "what computer am i using",
+        "what operating system am i using"
+    ]:
+
+        system_name = platform.system()
+        system_release = platform.release()
+        machine = platform.machine()
+
+        return jsonify({
+            "receivedCommand": command,
+            "action": "system_info",
+            "system": system_name,
+            "release": system_release,
+            "machine": machine,
+            "message": (
+                f"You are using {system_name} "
+                f"{system_release} on a {machine} machine."
+            )
+        })
+
+    # ========================================
+    # System Status
+    # ========================================
+
+    if command in [
+        "system status",
+        "computer status",
+        "pc status",
+        "laptop status"
+    ]:
+
+        return jsonify({
+            "receivedCommand": command,
+            "action": "system_status",
+            "message": "Your system is running normally."
+        })
+
+    # ========================================
+    # Battery Status
+    # ========================================
+
+    if command in [
+        "battery status",
+        "battery level",
+        "check battery",
+        "battery"
+    ]:
+
+        battery = psutil.sensors_battery()
+
+        if battery is None:
+            return jsonify({
+                "receivedCommand": command,
+                "action": "battery_status",
+                "message": "Battery information is not available on this computer."
+            })
+
+        percentage = battery.percent
+
+        if battery.power_plugged:
+            message = f"Your battery is at {percentage}% and the charger is connected."
+        else:
+            message = f"Your battery is at {percentage}% and the charger is not connected."
+
+        return jsonify({
+            "receivedCommand": command,
+            "action": "battery_status",
+            "percentage": percentage,
+            "powerPlugged": battery.power_plugged,
+            "message": message
+    })
+
+
+    # ========================================  
+    # CPU and RAM Status
+    # ========================================
+
+    if command in [
+        "cpu usage",
+        "cpu status",
+        "processor usage"
+    ]:
+
+        cpu_usage = psutil.cpu_percent(interval=1)
+
+        return jsonify({
+            "receivedCommand": command,
+            "action": "cpu_status",
+            "cpuUsage": cpu_usage,
+            "message": f"Current CPU usage is {cpu_usage}%."
+        })
+
+
+    if command in [
+        "ram usage",
+        "memory usage",
+        "ram status",
+        "memory status"
+    ]:
+
+        memory = psutil.virtual_memory()
+
+        ram_usage = memory.percent
+        ram_used_gb = round(memory.used / (1024 ** 3), 2)
+        ram_total_gb = round(memory.total / (1024 ** 3), 2)
+
+        return jsonify({
+            "receivedCommand": command,
+            "action": "ram_status",
+            "ramUsage": ram_usage,
+            "ramUsedGB": ram_used_gb,
+            "ramTotalGB": ram_total_gb,
+            "message": (
+                f"Current RAM usage is {ram_usage}%. "
+                f"You are using {ram_used_gb} GB out of {ram_total_gb} GB."
+        )
+    })
+
+
+    # ========================================
+    # Disk / Storage Status
+    # ========================================
+
+    if command in [
+        "disk status",
+        "disk usage",
+        "storage status",
+        "storage usage",
+        "check storage",
+        "check disk"
+    ]:
+
+        disk = psutil.disk_usage("C:\\")
+
+        total_gb = round(disk.total / (1024 ** 3), 2)
+        used_gb = round(disk.used / (1024 ** 3), 2)
+        free_gb = round(disk.free / (1024 ** 3), 2)
+        usage_percent = disk.percent
+
+        return jsonify({
+            "receivedCommand": command,
+            "action": "disk_status",
+            "totalGB": total_gb,
+            "usedGB": used_gb,
+            "freeGB": free_gb,
+            "usagePercent": usage_percent,
+            "message": (
+                f"Your C drive is {usage_percent}% full. "
+                f"{free_gb} GB is free out of {total_gb} GB."
+        )
+    })
+
+    # ========================================
+    # Internet / Network Status
+    # ========================================
+
+    if command in [
+        "internet status",
+        "internet connection",
+        "check internet",
+        "network status",
+        "network connection"
+    ]:
+
+        import socket
+
+        try:    
+            socket.create_connection(("8.8.8.8", 53), timeout=2)
+
+            return jsonify({
+                "receivedCommand": command,
+                "action": "internet_status",
+                "connected": True,
+                "message": "Your internet connection is active."
+            })
+
+        except OSError:
+
+            return jsonify({
+                "receivedCommand": command,
+                "action": "internet_status",
+                "connected": False,
+                "message": "Your internet connection appears to be unavailable."
+        })
 
     # ========================================
     # Open Notepad

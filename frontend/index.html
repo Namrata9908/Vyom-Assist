@@ -4,41 +4,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Vyom Assist</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+    <!-- ========================================
+         Main Heading
+    ======================================== -->
+
     <h1>Welcome to Vyom Assist</h1>
+
     <p>Your smart assistant is ready.</p>
-    <button id="startButton">Start Assistant</button>
-    <input type="text" id="commandInput" placeholder="Enter your command">
 
-    <button id="sendCommandButton">Send Command</button>
-    <button id="voiceButton">🎤 Speak Command</button>
 
-    <div id="shutdownModal" style="display: none;">
-        <div>
+    <!-- ========================================
+         Command Area
+    ======================================== -->
+
+    <div class="command-area">
+
+        <button id="startButton">
+            Start Assistant
+        </button>
+
+        <input
+            type="text"
+            id="commandInput"
+            placeholder="Enter your command"
+            autocomplete="off"
+        >
+
+        <button id="sendCommandButton">
+            Send Command
+        </button>
+
+        <button id="voiceButton">
+            🎤 Speak Command
+        </button>
+
+    </div>
+
+
+    <!-- ========================================
+         Shutdown Modal
+    ======================================== -->
+
+    <div id="shutdownModal" class="modal">
+
+        <div class="modal-content">
+
             <h3>Shutdown Computer?</h3>
-            <p>Are you sure you want to shut down the computer?</p>
 
-            <button id="shutdownYesButton">Yes</button>
-            <button id="shutdownNoButton">No</button>
+            <p>
+                Are you sure you want to shut down the computer?
+            </p>
+
+            <button id="shutdownYesButton">
+                Yes
+            </button>
+
+            <button id="shutdownNoButton">
+                No
+            </button>
+
         </div>
+
     </div>
 
-    <div id="restartModal" style="display: none;">
-        <div>
+
+    <!-- ========================================
+         Restart Modal
+    ======================================== -->
+
+    <div id="restartModal" class="modal">
+
+        <div class="modal-content">
+
             <h3>Restart Computer?</h3>
-            <p>Are you sure you want to restart the computer?</p>
 
-            <button id="restartYesButton">Yes</button>
-            <button id="restartNoButton">No</button>
+            <p>
+                Are you sure you want to restart the computer?
+            </p>
+
+            <button id="restartYesButton">
+                Yes
+            </button>
+
+            <button id="restartNoButton">
+                No
+            </button>
+
         </div>
+
     </div>
+
+
+    <!-- ========================================
+         Assistant Response
+    ======================================== -->
+
+    <div id="responseBox" class="response-box">
+
+        <strong>Vyom Assist:</strong>
+
+        <span id="responseMessage">
+            How can I help you?
+        </span>
+
+    </div>
+
+
+    <!-- ========================================
+         Command History
+    ======================================== -->
+
+    <div id="historyBox" class="history-box">
+
+        <div class="history-header">
+
+            <h3>Command History</h3>
+
+            <button
+                id="clearHistoryButton"
+                type="button"
+            >
+                🗑️ Clear History
+            </button>
+
+        </div>
+
+
+        <div id="historyList">
+
+            <p class="empty-history">
+                No commands yet.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================
+         JavaScript
+    ======================================== -->
 
     <script src="script.js"></script>
+
 </body>
 
 </html>

@@ -1,70 +1,411 @@
+/* ========================================
+   Global
+======================================== */
+
 body {
+
     font-family: Arial, sans-serif;
+
     text-align: center;
-    margin-top: 100px;
+
+    margin: 0;
+
+    padding: 60px 20px;
+
+    background: #f5f7fb;
+
 }
+
+
+/* ========================================
+   Main Heading
+======================================== */
 
 h1 {
-    font-size: 40px;
+
+    font-size: 42px;
+
+    margin-bottom: 15px;
+
 }
 
-p {
+
+/* ========================================
+   Subtitle
+======================================== */
+
+body>p {
+
     font-size: 20px;
+
+    margin-bottom: 35px;
+
 }
+
+
+/* ========================================
+   Command Area
+======================================== */
+
+.command-area {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 4px;
+
+}
+
+
+/* ========================================
+   Command Input
+======================================== */
+
+#commandInput {
+
+    width: 260px;
+
+    padding: 11px;
+
+    font-size: 15px;
+
+    border: 1px solid #bbb;
+
+    border-radius: 6px;
+
+    outline: none;
+
+}
+
+
+#commandInput:focus {
+
+    border-color: #777;
+
+}
+
+
+/* ========================================
+   Buttons
+======================================== */
 
 button {
-    margin-top: 20px;
-    padding: 10px 20px;
+
+    padding: 11px 18px;
+
+    margin: 4px;
+
+    font-size: 15px;
+
+    border: 1px solid #aaa;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    background: #ffffff;
+
+}
+
+
+button:hover {
+
+    opacity: 0.85;
+
+}
+
+
+button:disabled {
+
+    cursor: not-allowed;
+
+    opacity: 0.6;
+
+}
+
+
+/* ========================================
+   Assistant Response
+======================================== */
+
+.response-box {
+
+    width: 500px;
+
+    max-width: 90%;
+
+    margin: 20px auto;
+
+    padding: 16px 20px;
+
+    background: white;
+
+    border: 1px solid #d9dee8;
+
+    border-radius: 10px;
+
+    text-align: left;
+
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.08);
+
     font-size: 16px;
-    cursor: pointer;
+
+    line-height: 1.5;
+
 }
 
-#shutdownModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    justify-content: center;
+
+/* ========================================
+   Assistant Name
+======================================== */
+
+.response-box strong {
+
+    margin-right: 6px;
+
+}
+
+
+/* ========================================
+   Command History Box
+======================================== */
+
+.history-box {
+
+    width: 500px;
+
+    max-width: 90%;
+
+    margin: 25px auto;
+
+    text-align: left;
+
+}
+
+
+/* ========================================
+   History Header
+======================================== */
+
+.history-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
     align-items: center;
+
+    margin-bottom: 12px;
+
 }
 
-#shutdownModal>div {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
+
+.history-header h3 {
+
+    margin: 0;
+
+    font-size: 21px;
+
+}
+
+
+/* ========================================
+   Clear History Button
+======================================== */
+
+#clearHistoryButton {
+
+    padding: 8px 12px;
+
+    font-size: 13px;
+
+    margin: 0;
+
+}
+
+
+/* ========================================
+   History List
+======================================== */
+
+#historyList {
+
+    max-height: 300px;
+
+    overflow-y: auto;
+
+}
+
+
+/* ========================================
+   Empty History
+======================================== */
+
+.empty-history {
+
     text-align: center;
+
+    font-size: 16px;
+
+    margin: 20px 0;
+
 }
 
-#shutdownModal button {
-    padding: 10px 20px;
-    margin: 10px;
-    cursor: pointer;
+
+/* ========================================
+   Individual History Item
+======================================== */
+
+.history-item {
+
+    background: white;
+
+    border: 1px solid #d9dee8;
+
+    border-radius: 8px;
+
+    padding: 12px 15px;
+
+    margin-bottom: 10px;
+
+    line-height: 1.6;
+
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.05);
+
+    word-wrap: break-word;
+
 }
 
-#restartModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+
+.history-item strong {
+
+    margin-right: 4px;
+
+}
+
+
+/* ========================================
+   Modal
+======================================== */
+
+.modal {
+
     display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.45);
+
     justify-content: center;
+
     align-items: center;
+
+    z-index: 1000;
+
 }
 
-#restartModal>div {
+
+/* ========================================
+   Modal Content
+======================================== */
+
+.modal-content {
+
     background: white;
+
     padding: 25px;
+
     border-radius: 10px;
-    text-align: center;
+
+    width: 350px;
+
+    max-width: 85%;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.2);
+
 }
 
-#restartModal button {
-    padding: 10px 20px;
-    margin: 10px;
-    cursor: pointer;
+
+.modal-content h3 {
+
+    margin-top: 0;
+
+}
+
+
+.modal-content p {
+
+    font-size: 16px;
+
+    margin-bottom: 20px;
+
+}
+
+
+/* ========================================
+   Mobile
+======================================== */
+
+@media (max-width: 650px) {
+
+    body {
+
+        padding: 40px 15px;
+
+    }
+
+
+    h1 {
+
+        font-size: 32px;
+
+    }
+
+
+    .command-area {
+
+        flex-direction: column;
+
+    }
+
+
+    #commandInput {
+
+        width: 80%;
+
+    }
+
+
+    .response-box {
+
+        width: 90%;
+
+    }
+
+
+    .history-box {
+
+        width: 90%;
+
+    }
+
+
+    .history-header {
+
+        flex-direction: column;
+
+        gap: 10px;
+
+    }
+
 }
