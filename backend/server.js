@@ -10,13 +10,11 @@ app.use(express.json());
 
 const PORT = 5000;
 
-
 // ========================================
 // Command Normalizer
 // ========================================
 
 function normalizeCommand(command) {
-
     command = command.trim().toLowerCase();
 
     // Normalize multiple spaces
@@ -25,8 +23,29 @@ function normalizeCommand(command) {
     // Remove common punctuation
     command = command.replace(/[.!?]+$/, "");
 
+    // ========================================
+    // IMPORTANT:
+    // Recognize complete Vyom greetings FIRST
+    // before removing "hey", "vyom", etc.
+    // ========================================
 
+    const greetingAliases = {
+        "hello vyom assist": "hello",
+        "hello vyom": "hello",
+        "hi vyom assist": "hi",
+        "hi vyom": "hi",
+        "hey vyom assist": "hey",
+        "hey vyom": "hey"
+    };
+
+    if (greetingAliases[command]) {
+        command = greetingAliases[command];
+    }
+
+    // ========================================
     // Remove common polite prefixes
+    // ========================================
+
     const prefixesToRemove = [
         "please ",
         "can you ",
@@ -35,8 +54,6 @@ function normalizeCommand(command) {
         "will you ",
         "kindly ",
         "hey ",
-        "hey vyom ",
-        "hey vyom assist ",
         "vyom ",
         "vyom assist "
     ];
@@ -44,24 +61,16 @@ function normalizeCommand(command) {
     let changed = true;
 
     while (changed) {
-
         changed = false;
 
         for (const prefix of prefixesToRemove) {
-
             if (command.startsWith(prefix)) {
-
-                command = command.substring(
-                    prefix.length
-                ).trim();
-
+                command = command.substring(prefix.length).trim();
                 changed = true;
-
                 break;
             }
         }
     }
-
 
     // ========================================
     // Convert common OPEN variations
@@ -75,9 +84,7 @@ function normalizeCommand(command) {
     ];
 
     for (const prefix of openPrefixes) {
-
         if (command.startsWith(prefix)) {
-
             command =
                 "open " +
                 command.substring(prefix.length).trim();
@@ -85,7 +92,6 @@ function normalizeCommand(command) {
             break;
         }
     }
-
 
     // ========================================
     // Convert common TIME variations
@@ -99,7 +105,6 @@ function normalizeCommand(command) {
     ) {
         command = "what time is it";
     }
-
 
     // ========================================
     // Convert common DATE variations
@@ -118,7 +123,6 @@ function normalizeCommand(command) {
         command = "what is today's date";
     }
 
-
     // ========================================
     // Convert common LOCK variations
     // ========================================
@@ -129,7 +133,6 @@ function normalizeCommand(command) {
     ) {
         command = "lock computer";
     }
-
 
     // ========================================
     // Convert common SHUTDOWN variations
@@ -142,7 +145,6 @@ function normalizeCommand(command) {
         command = "shutdown computer";
     }
 
-
     // ========================================
     // Convert common SHUT DOWN variations
     // ========================================
@@ -154,7 +156,6 @@ function normalizeCommand(command) {
         command = "shutdown computer";
     }
 
-
     // ========================================
     // Convert common RESTART variations
     // ========================================
@@ -165,7 +166,6 @@ function normalizeCommand(command) {
     ) {
         command = "restart computer";
     }
-
 
     // ========================================
     // Convert common SEARCH variations
@@ -179,9 +179,7 @@ function normalizeCommand(command) {
     ];
 
     for (const prefix of searchPrefixes) {
-
         if (command.startsWith(prefix)) {
-
             command =
                 "search " +
                 command.substring(prefix.length).trim();
@@ -190,15 +188,16 @@ function normalizeCommand(command) {
         }
     }
 
+    // ========================================
+    // PC / Laptop / Reboot variations
+    // ========================================
 
-    // PC / laptop / reboot variations
     command = command
         .replace(/\bmy pc\b/g, "my computer")
         .replace(/\bthe pc\b/g, "the computer")
         .replace(/\bpc\b/g, "computer")
         .replace(/\blaptop\b/g, "computer")
         .replace(/\breboot\b/g, "restart");
-
 
     // ========================================
     // Direct Website / URL Commands
@@ -220,13 +219,11 @@ function normalizeCommand(command) {
     return command;
 }
 
-
 // ========================================
 // Send command to Python Assistant
 // ========================================
 
 function sendToPython(command, callback) {
-
     const data = JSON.stringify({
         command: command
     });
@@ -236,7 +233,6 @@ function sendToPython(command, callback) {
         port: 5001,
         path: "/assistant",
         method: "POST",
-
         headers: {
             "Content-Type": "application/json",
             "Content-Length": Buffer.byteLength(data)
@@ -244,7 +240,6 @@ function sendToPython(command, callback) {
     };
 
     const request = http.request(options, (response) => {
-
         let body = "";
 
         response.on("data", (chunk) => {
@@ -254,7 +249,6 @@ function sendToPython(command, callback) {
         response.on("end", () => {
             callback(null, body);
         });
-
     });
 
     request.on("error", (error) => {
@@ -265,63 +259,50 @@ function sendToPython(command, callback) {
     request.end();
 }
 
-
 // ========================================
 // Home
 // ========================================
 
 app.get("/", (req, res) => {
-
     res.send("Vyom Assist Backend is running!");
-
 });
-
 
 // ========================================
 // Health Check
 // ========================================
 
 app.get("/health", (req, res) => {
-
     res.json({
         status: "OK",
         message: "Vyom Assist backend is healthy"
     });
-
 });
-
 
 // ========================================
 // Shutdown Computer
 // ========================================
 
 app.post("/shutdown", (req, res) => {
-
     exec("shutdown /s /t 0");
 
     res.json({
         status: "success",
         message: "Computer is shutting down..."
     });
-
 });
-
 
 // ========================================
 // Restart Computer
 // ========================================
 
 app.post("/restart", (req, res) => {
-
     exec("shutdown /r /t 0");
 
     res.json({
         status: "success",
         message: "Computer is restarting..."
     });
-
 });
-
 
 // ========================================
 // Main Assistant Endpoint
@@ -333,15 +314,16 @@ app.post("/assistant", (req, res) => {
         req.body.command || ""
     );
 
-    sendToPython(command, (error, pythonResponse) => {
+    console.log("Received command:", req.body.command);
+    console.log("Normalized command:", command);
 
+    sendToPython(command, (error, pythonResponse) => {
 
         // ========================================
         // Python connection error
         // ========================================
 
         if (error) {
-
             console.error(
                 "Python Assistant error:",
                 error.message
@@ -356,48 +338,56 @@ app.post("/assistant", (req, res) => {
             return;
         }
 
-
         console.log(
             "Python response:",
             pythonResponse
         );
 
+        let pythonData;
 
-        const pythonData = JSON.parse(pythonResponse);
+        try {
+            pythonData = JSON.parse(pythonResponse);
+        }
+        catch (parseError) {
 
+            console.error(
+                "Invalid Python response:",
+                parseError.message
+            );
+
+            res.status(500).json({
+                receivedCommand: command,
+                action: "none",
+                message: "Invalid response from Python Assistant."
+            });
+
+            return;
+        }
 
         // ========================================
         // Greeting
         // ========================================
 
         if (pythonData.action === "greeting") {
-
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Time
         // ========================================
 
         if (pythonData.action === "time") {
-
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Date
         // ========================================
 
         if (pythonData.action === "date") {
-
             res.json(pythonData);
-
             return;
         }
 
@@ -406,9 +396,7 @@ app.post("/assistant", (req, res) => {
         // ========================================
 
         if (pythonData.action === "system_info") {
-
             res.json(pythonData);
-
             return;
         }
 
@@ -417,9 +405,7 @@ app.post("/assistant", (req, res) => {
         // ========================================
 
         if (pythonData.action === "system_status") {
-
             res.json(pythonData);
-
             return;
         }
 
@@ -428,9 +414,7 @@ app.post("/assistant", (req, res) => {
         // ========================================
 
         if (pythonData.action === "battery_status") {
-
             res.json(pythonData);
-
             return;
         }
 
@@ -439,9 +423,7 @@ app.post("/assistant", (req, res) => {
         // ========================================
 
         if (pythonData.action === "cpu_status") {
-
             res.json(pythonData);
-
             return;
         }
 
@@ -450,9 +432,7 @@ app.post("/assistant", (req, res) => {
         // ========================================
 
         if (pythonData.action === "ram_status") {
-
             res.json(pythonData);
-
             return;
         }
 
@@ -461,9 +441,7 @@ app.post("/assistant", (req, res) => {
         // ========================================
 
         if (pythonData.action === "disk_status") {
-
             res.json(pythonData);
-
             return;
         }
 
@@ -472,9 +450,7 @@ app.post("/assistant", (req, res) => {
         // ========================================
 
         if (pythonData.action === "internet_status") {
-
             res.json(pythonData);
-
             return;
         }
 
@@ -483,92 +459,71 @@ app.post("/assistant", (req, res) => {
         // ========================================
 
         if (pythonData.action === "search_google") {
-
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Open Calculator
         // ========================================
 
         if (pythonData.action === "open_calculator") {
-
             exec("start calc");
 
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Open Notepad
         // ========================================
 
         if (pythonData.action === "open_notepad") {
-
             exec("start notepad");
 
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Open Command Prompt
         // ========================================
 
         if (pythonData.action === "open_command_prompt") {
-
             exec("start cmd");
 
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Open Task Manager
         // ========================================
 
         if (pythonData.action === "open_task_manager") {
-
             exec("start taskmgr");
 
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Shutdown Confirmation
         // ========================================
 
         if (pythonData.action === "shutdown_confirmation") {
-
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Restart Confirmation
         // ========================================
 
         if (pythonData.action === "restart_confirmation") {
-
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Lock Computer
@@ -581,52 +536,41 @@ app.post("/assistant", (req, res) => {
             );
 
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Open File Explorer
         // ========================================
 
         if (pythonData.action === "open_file_explorer") {
-
             exec("start explorer");
 
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Open Settings
         // ========================================
 
         if (pythonData.action === "open_settings") {
-
             exec("start ms-settings:");
 
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Open Chrome
         // ========================================
 
         if (pythonData.action === "open_chrome") {
-
             exec("start chrome");
 
             res.json(pythonData);
-
             return;
         }
-
 
         // ========================================
         // Open YouTube
@@ -635,18 +579,13 @@ app.post("/assistant", (req, res) => {
         if (command === "open youtube") {
 
             res.json({
-
                 receivedCommand: command,
-
                 action: "open_youtube",
-
                 message: "Opening YouTube..."
-
             });
 
             return;
         }
-
 
         // ========================================
         // Open Google
@@ -655,18 +594,13 @@ app.post("/assistant", (req, res) => {
         if (command === "open google") {
 
             res.json({
-
                 receivedCommand: command,
-
                 action: "open_google",
-
                 message: "Opening Google..."
-
             });
 
             return;
         }
-
 
         // ========================================
         // Open Gmail
@@ -675,18 +609,13 @@ app.post("/assistant", (req, res) => {
         if (command === "open gmail") {
 
             res.json({
-
                 receivedCommand: command,
-
                 action: "open_gmail",
-
                 message: "Opening Gmail..."
-
             });
 
             return;
         }
-
 
         // ========================================
         // Google Search
@@ -697,23 +626,16 @@ app.post("/assistant", (req, res) => {
             const searchQuery =
                 command.substring(7).trim();
 
-
             res.json({
-
                 receivedCommand: command,
-
                 action: "search_google",
-
                 query: searchQuery,
-
                 message:
                     `Searching Google for ${searchQuery}...`
-
             });
 
             return;
         }
-
 
         // ========================================
         // Open Any Website - Smart
@@ -724,89 +646,62 @@ app.post("/assistant", (req, res) => {
             const websiteName =
                 command.substring(5).trim();
 
-
             if (websiteName !== "") {
 
                 let websiteUrl;
-
 
                 // Complete URL
                 if (
                     websiteName.startsWith("http://") ||
                     websiteName.startsWith("https://")
                 ) {
-
                     websiteUrl = websiteName;
-
                 }
-
 
                 // Domain like github.com
                 else if (websiteName.includes(".")) {
-
                     websiteUrl =
                         `https://${websiteName}`;
-
                 }
-
 
                 // Assume .com
                 else {
-
                     websiteUrl =
                         `https://www.${websiteName}.com`;
-
                 }
 
-
                 res.json({
-
                     receivedCommand: command,
-
                     action: "open_website",
-
                     website: websiteName,
-
                     url: websiteUrl,
-
                     message:
                         `Opening ${websiteName}...`
-
                 });
 
                 return;
             }
         }
 
-
         // ========================================
         // Default Response
         // ========================================
 
         res.json({
-
             receivedCommand: command,
-
             action: "none",
-
             message:
                 `Vyom Assist received your command: ${command}`
-
         });
-
     });
-
 });
-
 
 // ========================================
 // Start Server
 // ========================================
 
 app.listen(PORT, () => {
-
     console.log(
         `Vyom Assist Backend running on http://localhost:${PORT}`
     );
-
 });

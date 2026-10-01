@@ -55,6 +55,14 @@ const clearHistoryButton =
 
 
 // ========================================
+// Local Storage Key
+// ========================================
+
+const HISTORY_STORAGE_KEY =
+    "vyomAssistCommandHistory";
+
+
+// ========================================
 // Show Assistant Response
 // ========================================
 
@@ -100,7 +108,9 @@ function addToHistory(command, response) {
     }
 
 
-    // Create history item
+    // ========================================
+    // Create History Item
+    // ========================================
 
     const historyItem =
         document.createElement("div");
@@ -202,6 +212,262 @@ function addToHistory(command, response) {
 
 
 // ========================================
+// Save History to Local Storage
+// ========================================
+
+function saveHistory(command, response) {
+
+    let history = [];
+
+
+    try {
+
+        const savedHistory =
+            localStorage.getItem(
+                HISTORY_STORAGE_KEY
+            );
+
+
+        if (savedHistory) {
+
+            history =
+                JSON.parse(savedHistory);
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Could not read saved history:",
+            error
+        );
+
+        history = [];
+
+    }
+
+
+    // Add newest command at beginning
+
+    history.unshift({
+        command: command,
+        response: response
+    });
+
+
+    try {
+
+        localStorage.setItem(
+            HISTORY_STORAGE_KEY,
+            JSON.stringify(history)
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Could not save command history:",
+            error
+        );
+
+    }
+
+}
+
+
+// ========================================
+// Load History from Local Storage
+// ========================================
+
+function loadHistory() {
+
+    let history = [];
+
+
+    try {
+
+        const savedHistory =
+            localStorage.getItem(
+                HISTORY_STORAGE_KEY
+            );
+
+
+        if (savedHistory) {
+
+            history =
+                JSON.parse(savedHistory);
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Could not load command history:",
+            error
+        );
+
+        history = [];
+
+    }
+
+
+    // ========================================
+    // Validate History
+    // ========================================
+
+    if (!Array.isArray(history)) {
+
+        history = [];
+
+    }
+
+
+    // ========================================
+    // Display Saved History
+    // ========================================
+
+    if (history.length === 0) {
+
+        return;
+
+    }
+
+
+    const emptyMessage =
+        historyList.querySelector(
+            ".empty-history"
+        );
+
+
+    if (emptyMessage) {
+
+        emptyMessage.remove();
+
+    }
+
+
+    // History is already newest → oldest
+
+    history.forEach(
+        function (item) {
+
+            if (
+                !item ||
+                typeof item.command !== "string" ||
+                typeof item.response !== "string"
+            ) {
+
+                return;
+
+            }
+
+
+            const historyItem =
+                document.createElement("div");
+
+
+            historyItem.className =
+                "history-item";
+
+
+            // ========================================
+            // User Command
+            // ========================================
+
+            const commandLine =
+                document.createElement("div");
+
+
+            const commandLabel =
+                document.createElement("strong");
+
+
+            commandLabel.textContent =
+                "You: ";
+
+
+            const commandText =
+                document.createElement("span");
+
+
+            commandText.textContent =
+                item.command;
+
+
+            commandLine.appendChild(
+                commandLabel
+            );
+
+
+            commandLine.appendChild(
+                commandText
+            );
+
+
+            // ========================================
+            // Assistant Response
+            // ========================================
+
+            const responseLine =
+                document.createElement("div");
+
+
+            const responseLabel =
+                document.createElement("strong");
+
+
+            responseLabel.textContent =
+                "Vyom Assist: ";
+
+
+            const responseText =
+                document.createElement("span");
+
+
+            responseText.textContent =
+                item.response;
+
+
+            responseLine.appendChild(
+                responseLabel
+            );
+
+
+            responseLine.appendChild(
+                responseText
+            );
+
+
+            // ========================================
+            // Add to History Item
+            // ========================================
+
+            historyItem.appendChild(
+                commandLine
+            );
+
+
+            historyItem.appendChild(
+                responseLine
+            );
+
+
+            historyList.appendChild(
+                historyItem
+            );
+
+        }
+    );
+
+}
+
+
+// ========================================
 // Clear Command History
 // ========================================
 
@@ -239,11 +505,20 @@ clearHistoryButton.addEventListener(
         }
 
 
+        // Clear displayed history
+
         historyList.innerHTML = `
             <p class="empty-history">
                 No commands yet.
             </p>
         `;
+
+
+        // Clear saved history
+
+        localStorage.removeItem(
+            HISTORY_STORAGE_KEY
+        );
 
 
         showResponse(
@@ -252,6 +527,13 @@ clearHistoryButton.addEventListener(
 
     }
 );
+
+
+// ========================================
+// Load Saved History on Page Start
+// ========================================
+
+loadHistory();
 
 
 // ========================================
@@ -352,13 +634,31 @@ sendCommandButton.addEventListener(
 
 
             // ========================================
+            // Assistant Response for History
+            // ========================================
+
+            const historyResponse =
+                data.message ||
+                "Command processed.";
+
+
+            // ========================================
             // Add Command to History
             // ========================================
 
             addToHistory(
                 command,
-                data.message ||
-                "Command processed."
+                historyResponse
+            );
+
+
+            // ========================================
+            // Save Command to Local Storage
+            // ========================================
+
+            saveHistory(
+                command,
+                historyResponse
             );
 
 

@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from datetime import datetime
 import platform
 import psutil
+import socket
 
 app = Flask(__name__)
 
@@ -9,6 +10,7 @@ app = Flask(__name__)
 # ========================================
 # Common Command Normalizer
 # ========================================
+
 def normalize_command(command):
 
     command = command.strip().lower()
@@ -18,6 +20,25 @@ def normalize_command(command):
 
     # Remove common punctuation at the end
     command = command.rstrip(".!?")
+
+    # ========================================
+    # Exact Greeting Aliases
+    # ========================================
+    # Handle these BEFORE generic prefix removal.
+    # This prevents greeting commands from being
+    # accidentally changed into "assist" or another word.
+
+    greeting_aliases = {
+        "hello vyom assist": "hello",
+        "hello vyom": "hello",
+        "hi vyom assist": "hi",
+        "hi vyom": "hi",
+        "hey vyom assist": "hey",
+        "hey vyom": "hey"
+    }
+
+    if command in greeting_aliases:
+        command = greeting_aliases[command]
 
     # ========================================
     # Remove common polite prefixes
@@ -30,11 +51,8 @@ def normalize_command(command):
         "would you ",
         "will you ",
         "kindly ",
-        "hey ",
-        "hey vyom ",
-        "hey vyom assist ",
-        "vyom ",
-        "vyom assist "
+        "vyom assist ",
+        "vyom "
     ]
 
     changed = True
@@ -50,7 +68,6 @@ def normalize_command(command):
                 command = command[len(prefix):].strip()
                 changed = True
                 break
-
 
     # ========================================
     # Convert launch / start / go to / visit
@@ -71,7 +88,6 @@ def normalize_command(command):
             command = "open " + command[len(prefix):].strip()
             break
 
-
     # ========================================
     # PC / Laptop normalization
     # ========================================
@@ -79,17 +95,14 @@ def normalize_command(command):
     command = command.replace("my pc", "my computer")
     command = command.replace("the pc", "the computer")
 
-    # Standalone PC
     if command == "pc":
         command = "computer"
 
-    # Laptop variations
     command = command.replace("my laptop", "my computer")
     command = command.replace("the laptop", "the computer")
 
     if command == "laptop":
         command = "computer"
-
 
     # ========================================
     # Reboot → Restart
@@ -102,7 +115,6 @@ def normalize_command(command):
     elif command == "reboot":
 
         command = "restart"
-
 
     # ========================================
     # Time variations
@@ -118,7 +130,6 @@ def normalize_command(command):
     ]:
 
         command = "what time is it"
-
 
     # ========================================
     # Date variations
@@ -138,9 +149,6 @@ def normalize_command(command):
 
         command = "what is today's date"
 
-
-    
-    
     # ========================================
     # Lock variations
     # ========================================
@@ -155,7 +163,6 @@ def normalize_command(command):
     ]:
 
         command = "lock computer"
-
 
     # ========================================
     # Shutdown variations
@@ -178,7 +185,6 @@ def normalize_command(command):
 
         command = "shutdown computer"
 
-
     # ========================================
     # Restart variations
     # ========================================
@@ -193,7 +199,6 @@ def normalize_command(command):
     ]:
 
         command = "restart computer"
-
 
     # ========================================
     # Search variations
@@ -213,8 +218,6 @@ def normalize_command(command):
             command = "search " + command[len(prefix):].strip()
             break
 
-        
-
     return command
 
 
@@ -224,6 +227,7 @@ def normalize_command(command):
 
 @app.route("/")
 def home():
+
     return "Vyom Assist Python Assistant is running!"
 
 
@@ -253,32 +257,46 @@ def assistant():
         data.get("command", "")
     )
 
-
     # ========================================
-    # Hello
+    # Greetings
     # ========================================
 
-    if command == "hello":
+    if command in [
+        "hello",
+        "hi",
+        "hey",
+        "vyom",
+        "good morning",
+        "good afternoon",
+        "good evening",
+        "good night"
+    ]:
+
+        if command == "good morning":
+
+            message = "Good morning! How can I help you?"
+
+        elif command == "good afternoon":
+
+            message = "Good afternoon! How can I help you?"
+
+        elif command == "good evening":
+
+            message = "Good evening! How can I help you?"
+
+        elif command == "good night":
+
+            message = "Good night! Have a great day ahead!"
+
+        else:
+
+            message = "Hello! I am Vyom Assist. How can I help you?"
 
         return jsonify({
             "receivedCommand": command,
             "action": "greeting",
-            "message": "Hello! I am Vyom Assist. How can I help you?"
+            "message": message
         })
-
-
-    # ========================================
-    # Hi
-    # ========================================
-
-    if command == "hi":
-
-        return jsonify({
-            "receivedCommand": command,
-            "action": "greeting",
-            "message": "Hi! I am Vyom Assist. How can I help you?"
-        })
-
 
     # ========================================
     # How are you
@@ -292,7 +310,6 @@ def assistant():
             "message": "I am doing great! How can I help you?"
         })
 
-
     # ========================================
     # Name
     # ========================================
@@ -304,7 +321,6 @@ def assistant():
             "action": "greeting",
             "message": "My name is Vyom Assist."
         })
-
 
     # ========================================
     # Time
@@ -319,7 +335,6 @@ def assistant():
             "action": "time",
             "message": f"The current time is {current_time}."
         })
-
 
     # ========================================
     # Date
@@ -395,6 +410,7 @@ def assistant():
         battery = psutil.sensors_battery()
 
         if battery is None:
+
             return jsonify({
                 "receivedCommand": command,
                 "action": "battery_status",
@@ -404,9 +420,18 @@ def assistant():
         percentage = battery.percent
 
         if battery.power_plugged:
-            message = f"Your battery is at {percentage}% and the charger is connected."
+
+            message = (
+                f"Your battery is at {percentage}% "
+                f"and the charger is connected."
+            )
+
         else:
-            message = f"Your battery is at {percentage}% and the charger is not connected."
+
+            message = (
+                f"Your battery is at {percentage}% "
+                f"and the charger is not connected."
+            )
 
         return jsonify({
             "receivedCommand": command,
@@ -414,11 +439,10 @@ def assistant():
             "percentage": percentage,
             "powerPlugged": battery.power_plugged,
             "message": message
-    })
+        })
 
-
-    # ========================================  
-    # CPU and RAM Status
+    # ========================================
+    # CPU Status
     # ========================================
 
     if command in [
@@ -436,6 +460,9 @@ def assistant():
             "message": f"Current CPU usage is {cpu_usage}%."
         })
 
+    # ========================================
+    # RAM Status
+    # ========================================
 
     if command in [
         "ram usage",
@@ -458,10 +485,10 @@ def assistant():
             "ramTotalGB": ram_total_gb,
             "message": (
                 f"Current RAM usage is {ram_usage}%. "
-                f"You are using {ram_used_gb} GB out of {ram_total_gb} GB."
-        )
-    })
-
+                f"You are using {ram_used_gb} GB out of "
+                f"{ram_total_gb} GB."
+            )
+        })
 
     # ========================================
     # Disk / Storage Status
@@ -493,8 +520,8 @@ def assistant():
             "message": (
                 f"Your C drive is {usage_percent}% full. "
                 f"{free_gb} GB is free out of {total_gb} GB."
-        )
-    })
+            )
+        })
 
     # ========================================
     # Internet / Network Status
@@ -508,10 +535,12 @@ def assistant():
         "network connection"
     ]:
 
-        import socket
+        try:
 
-        try:    
-            socket.create_connection(("8.8.8.8", 53), timeout=2)
+            socket.create_connection(
+                ("8.8.8.8", 53),
+                timeout=2
+            )
 
             return jsonify({
                 "receivedCommand": command,
@@ -527,7 +556,7 @@ def assistant():
                 "action": "internet_status",
                 "connected": False,
                 "message": "Your internet connection appears to be unavailable."
-        })
+            })
 
     # ========================================
     # Open Notepad
@@ -541,7 +570,6 @@ def assistant():
             "message": "Opening Notepad..."
         })
 
-
     # ========================================
     # Open Command Prompt
     # ========================================
@@ -553,7 +581,6 @@ def assistant():
             "action": "open_command_prompt",
             "message": "Opening Command Prompt..."
         })
-
 
     # ========================================
     # Open File Explorer
@@ -567,7 +594,6 @@ def assistant():
             "message": "Opening File Explorer..."
         })
 
-
     # ========================================
     # Open Settings
     # ========================================
@@ -579,7 +605,6 @@ def assistant():
             "action": "open_settings",
             "message": "Opening Settings..."
         })
-
 
     # ========================================
     # Open Task Manager
@@ -593,7 +618,6 @@ def assistant():
             "message": "Opening Task Manager..."
         })
 
-
     # ========================================
     # Shutdown Computer
     # ========================================
@@ -606,11 +630,9 @@ def assistant():
             "message": "Are you sure you want to shut down the computer?"
         })
 
-
     # ========================================
     # Restart Computer
     # ========================================
-    
 
     if command == "restart computer":
 
@@ -619,7 +641,6 @@ def assistant():
             "action": "restart_confirmation",
             "message": "Are you sure you want to restart the computer?"
         })
-
 
     # ========================================
     # Lock Computer
@@ -633,7 +654,6 @@ def assistant():
             "message": "Locking the computer..."
         })
 
-
     # ========================================
     # Open Calculator
     # ========================================
@@ -645,7 +665,6 @@ def assistant():
             "action": "open_calculator",
             "message": "Opening Calculator..."
         })
-
 
     # ========================================
     # Natural Language Search
@@ -677,7 +696,6 @@ def assistant():
                     "message": f"Searching Google for {search_query}..."
                 })
 
-
     # ========================================
     # Open Chrome
     # ========================================
@@ -690,7 +708,6 @@ def assistant():
             "message": "Opening Google Chrome..."
         })
 
-
     # ========================================
     # Open YouTube
     # ========================================
@@ -702,7 +719,6 @@ def assistant():
             "action": "open_youtube",
             "message": "Opening YouTube..."
         })
-
 
     # ========================================
     # Default Response
