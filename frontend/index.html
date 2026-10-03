@@ -2,15 +2,20 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Vyom Assist</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
+
 <body>
+
 
     <!-- ========================================
          Main Heading
@@ -27,24 +32,261 @@
 
     <div class="command-area">
 
-        <button id="startButton">
+        <button id="startButton" type="button">
             Start Assistant
         </button>
 
-        <input
-            type="text"
-            id="commandInput"
-            placeholder="Enter your command"
-            autocomplete="off"
-        >
+        <input type="text" id="commandInput" placeholder="Enter your command" autocomplete="off"
+            list="commandSuggestions">
 
-        <button id="sendCommandButton">
+
+        <!-- Command Suggestions -->
+
+        <datalist id="commandSuggestions">
+
+            <!-- Assistant -->
+
+            <option value="hello">
+            <option value="hi">
+            <option value="hey">
+            <option value="how are you">
+            <option value="what is your name">
+            <option value="what is the time">
+            <option value="what is the date">
+
+
+                <!-- System -->
+
+            <option value="system status">
+            <option value="system info">
+            <option value="cpu status">
+            <option value="ram status">
+            <option value="disk status">
+            <option value="battery status">
+            <option value="internet status">
+
+
+                <!-- Applications -->
+
+            <option value="open calculator">
+            <option value="open chrome">
+            <option value="open notepad">
+            <option value="open task manager">
+            <option value="open command prompt">
+
+
+                <!-- Websites -->
+
+            <option value="open google">
+            <option value="open youtube">
+            <option value="open gmail">
+            <option value="open wikipedia.org">
+
+
+                <!-- Search -->
+
+            <option value="search google for computer engineering jobs">
+            <option value="search google for latest technology news">
+
+
+                <!-- Computer Controls -->
+
+            <option value="lock computer">
+            <option value="restart computer">
+            <option value="shutdown computer">
+
+        </datalist>
+
+
+        <button id="sendCommandButton" type="button">
             Send Command
         </button>
 
-        <button id="voiceButton">
+        <button id="voiceButton" type="button">
             🎤 Speak Command
         </button>
+
+    </div>
+
+
+    <!-- ========================================
+         Assistant Response
+    ======================================== -->
+
+    <div id="responseBox" class="response-box status-ready">
+
+        <div class="response-status">
+
+            <span id="responseStatusIndicator" class="status-indicator">
+                🟢
+            </span>
+
+            <strong id="responseStatusText">
+                Ready
+            </strong>
+
+        </div>
+
+
+        <div class="response-message">
+
+            <strong>Vyom Assist:</strong>
+
+            <span id="responseMessage">
+                How can I help you?
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================
+         Quick Commands
+    ======================================== -->
+
+    <div class="command-category-box">
+
+        <h3>⚡ Quick Commands</h3>
+
+
+        <!-- Assistant -->
+
+        <div class="command-category">
+
+            <h4>🤖 Assistant</h4>
+
+            <div class="category-command-list">
+
+                <button class="quick-command-button" data-command="what is the time" type="button">
+                    🕐 Time
+                </button>
+
+
+                <button class="quick-command-button" data-command="what is the date" type="button">
+                    📅 Date
+                </button>
+
+
+                <button class="quick-command-button" data-command="how are you" type="button">
+                    😊 How are you?
+                </button>
+
+
+                <button class="quick-command-button" data-command="what is your name" type="button">
+                    🪪 Your Name
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- System -->
+
+        <div class="command-category">
+
+            <h4>🖥️ System</h4>
+
+            <div class="category-command-list">
+
+                <button class="quick-command-button" data-command="system status" type="button">
+                    💻 System Status
+                </button>
+
+
+                <button class="quick-command-button" data-command="cpu status" type="button">
+                    ⚙️ CPU Status
+                </button>
+
+
+                <button class="quick-command-button" data-command="ram status" type="button">
+                    🧠 RAM Status
+                </button>
+
+
+                <button class="quick-command-button" data-command="disk status" type="button">
+                    💾 Disk Status
+                </button>
+
+
+                <button class="quick-command-button" data-command="battery status" type="button">
+                    🔋 Battery Status
+                </button>
+
+
+                <button class="quick-command-button" data-command="internet status" type="button">
+                    🌐 Internet Status
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Applications -->
+
+        <div class="command-category">
+
+            <h4>🛠️ Applications</h4>
+
+            <div class="category-command-list">
+
+                <button class="quick-command-button" data-command="open calculator" type="button">
+                    🖩 Calculator
+                </button>
+
+
+                <button class="quick-command-button" data-command="open chrome" type="button">
+                    🌐 Chrome
+                </button>
+
+
+                <button class="quick-command-button" data-command="open notepad" type="button">
+                    📝 Notepad
+                </button>
+
+
+                <button class="quick-command-button" data-command="open task manager" type="button">
+                    📊 Task Manager
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Internet -->
+
+        <div class="command-category">
+
+            <h4>🌐 Internet</h4>
+
+            <div class="category-command-list">
+
+                <button class="quick-command-button" data-command="open google" type="button">
+                    🔎 Google
+                </button>
+
+
+                <button class="quick-command-button" data-command="open youtube" type="button">
+                    ▶️ YouTube
+                </button>
+
+
+                <button class="quick-command-button" data-command="open gmail" type="button">
+                    ✉️ Gmail
+                </button>
+
+
+                <button class="quick-command-button" data-command="search google for computer engineering jobs"
+                    type="button">
+                    🔍 Google Search
+                </button>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -63,11 +305,11 @@
                 Are you sure you want to shut down the computer?
             </p>
 
-            <button id="shutdownYesButton">
+            <button id="shutdownYesButton" type="button">
                 Yes
             </button>
 
-            <button id="shutdownNoButton">
+            <button id="shutdownNoButton" type="button">
                 No
             </button>
 
@@ -90,30 +332,15 @@
                 Are you sure you want to restart the computer?
             </p>
 
-            <button id="restartYesButton">
+            <button id="restartYesButton" type="button">
                 Yes
             </button>
 
-            <button id="restartNoButton">
+            <button id="restartNoButton" type="button">
                 No
             </button>
 
         </div>
-
-    </div>
-
-
-    <!-- ========================================
-         Assistant Response
-    ======================================== -->
-
-    <div id="responseBox" class="response-box">
-
-        <strong>Vyom Assist:</strong>
-
-        <span id="responseMessage">
-            How can I help you?
-        </span>
 
     </div>
 
@@ -128,10 +355,7 @@
 
             <h3>Command History</h3>
 
-            <button
-                id="clearHistoryButton"
-                type="button"
-            >
+            <button id="clearHistoryButton" type="button">
                 🗑️ Clear History
             </button>
 
@@ -150,10 +374,59 @@
 
 
     <!-- ========================================
-         JavaScript
+         Quick Command JavaScript
+    ======================================== -->
+
+    <script>
+
+        const quickCommandButtons =
+            document.querySelectorAll(
+                ".quick-command-button"
+            );
+
+
+        quickCommandButtons.forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const command =
+                            button.dataset.command;
+
+                        const commandInput =
+                            document.getElementById(
+                                "commandInput"
+                            );
+
+                        const sendCommandButton =
+                            document.getElementById(
+                                "sendCommandButton"
+                            );
+
+
+                        commandInput.value =
+                            command;
+
+
+                        sendCommandButton.click();
+
+                    }
+                );
+
+            }
+        );
+
+    </script>
+
+
+    <!-- ========================================
+         Main JavaScript
     ======================================== -->
 
     <script src="script.js"></script>
+
 
 </body>
 
